@@ -10,7 +10,7 @@ A lightweight **TPI (Three-Party Integrity)** blockchain focused on accessibilit
 
 ---
 
-## This is a TPI Chain
+## What is a TPI Chain
 
 Valid Blockchain uses **Three-Party Integrity (TPI)** — an original consensus mechanism, not a variant of Proof of Stake, Proof of Work, or Delegated PoS.
 
@@ -18,11 +18,11 @@ Valid Blockchain uses **Three-Party Integrity (TPI)** — an original consensus 
 - Exactly 3 validators are randomly selected from a pool of participants per block slot
 - Each computes a candidate block hash independently
 - The highest-merit validator among those in agreement produces the block
-- The other two verify — finality requires 2/3 agreement
-- Bad behavior loses standing, not tokens
-- No capital at stake and no computational race. Merit is gained through participation.
+- The other two verify — finality requires 2/3 agreement(66.66%)
+- Bad behavior loses standing in merit, not tokens as no staking is required
+- No capital at stake and no computational race. Merit is gained through participation, wallet age, and must be maintained to avoid decay.
 
-TPI is not borrowed from anywhere. I happily spent the past several years developing this as a counter-reaction to unnecessarily heavy blockchain consensus, finality, and state bloat.
+TPI is not borrowed from anywhere. I happily spent the past several years developing this as a counter-reaction to unnecessarily heavy blockchain consensus and finality.
 
 ---
 
