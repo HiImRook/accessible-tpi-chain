@@ -10,7 +10,7 @@ A lightweight **TPI (Three-Party Integrity)** blockchain focused on accessibilit
 
 ---
 
-## What is a TPI Chain
+## What is a TPI Chain?
 
 Valid Blockchain uses **Three-Party Integrity (TPI)** — an original consensus mechanism, not a variant of Proof of Stake, Proof of Work, or Delegated PoS.
 
