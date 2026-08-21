@@ -1,357 +1,293 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Valid Blockchain - Accessible Proof-of-Stake</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Valid Blockchain — accessible TPI consensus</title>
+<style>
+  @font-face {
+    font-family: 'Orbitron';
+    src: url('Orbitron.ttf') format('truetype');
+    font-weight: 700 900;
+    font-display: swap;
+  }
 
-        html {
-            scroll-behavior: smooth;
-        }
+  :root {
+    --bg: #0a0e0a; --bg-raise: #0d130d; --green: #33ff66;
+    --green-dim: #1f9e40; --green-faint: #12351c; --text: #b8f0c4; --text-dim: #6fae7f; --amber: #ffb84d;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { background: var(--bg); color: var(--text); font-family: "Courier New","Consolas","DejaVu Sans Mono",monospace; line-height: 1.6; font-size: 16px; overflow-x: hidden; position: relative; }
+  body::before { content:""; position: fixed; inset: 0; background: repeating-linear-gradient(to bottom, rgba(0,0,0,0) 0px, rgba(0,0,0,0) 2px, rgba(0,0,0,0.18) 3px, rgba(0,0,0,0) 4px); pointer-events: none; z-index: 100; }
+  body::after { content:""; position: fixed; inset: 0; background: radial-gradient(ellipse at center, rgba(0,0,0,0) 55%, rgba(0,0,0,0.45) 100%); pointer-events: none; z-index: 99; }
+  .wrap { max-width: 860px; margin: 0 auto; padding: 0 24px; }
 
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: #0a0a0a;
-            color: #e0e0e0;
-            line-height: 1.6;
-            padding-top: 60px;
-        }
+  .topnav { position: sticky; top: 0; z-index: 90; background: rgba(10,14,10,0.85); backdrop-filter: blur(6px); border-bottom: 1px solid var(--green-faint); }
+  .nav-inner { display: flex; align-items: center; justify-content: space-between; height: 56px; }
+  .nav-brand { color: var(--green); font-weight: 700; letter-spacing: 2px; font-size: 15px; text-decoration: none; text-shadow: 0 0 6px rgba(51,255,102,0.4); }
+  .nav-links { display: flex; gap: 24px; }
+  .nav-links a { color: var(--text-dim); font-size: 14px; text-decoration: none; letter-spacing: 1px; }
+  .nav-links a:hover { color: var(--green); text-shadow: 0 0 6px rgba(51,255,102,0.5); }
+  @media (max-width: 620px) { .nav-links { gap: 14px; } .nav-links a { font-size: 12px; } .nav-brand { font-size: 13px; } }
 
-        .navbar {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            background: rgba(26, 26, 26, 0.95);
-            backdrop-filter: blur(10px);
-            border-bottom: 1px solid #333;
-            z-index: 1000;
-        }
+  header { min-height: 72vh; display: flex; flex-direction: column; justify-content: center; padding: 70px 0 40px; }
+  .logo { font-family: 'Orbitron', sans-serif; font-size: clamp(44px, 10vw, 96px); font-weight: 900; letter-spacing: 8px; color: var(--green); text-shadow: 0 0 8px rgba(51,255,102,0.55), 0 0 22px rgba(51,255,102,0.25); line-height: 1; }
+  .logo .cursor { display: inline-block; width: 0.06em; height: 0.9em; background: var(--green); box-shadow: 0 0 6px rgba(51,255,102,0.6); animation: blink 1.4s steps(1,end) infinite; margin-left: 8px; vertical-align: baseline; position: relative; z-index: 101; }
+  @keyframes blink { 0%,50% { opacity: 1; } 50.01%,100% { opacity: 0; } }
+  .tagline { font-size: clamp(16px,2.6vw,22px); color: var(--text); margin-top: 24px; max-width: 640px; }
+  .tagline .hl { color: var(--green); }
+  .sub { color: var(--text-dim); margin-top: 14px; font-size: 15px; }
+  .cta-row { margin-top: 34px; display: flex; gap: 16px; flex-wrap: wrap; }
+  .btn { border: 1px solid var(--green-dim); color: var(--green); padding: 12px 22px; font-family: inherit; font-size: 15px; background: transparent; text-decoration: none; letter-spacing: 1px; transition: background 0.15s, box-shadow 0.15s; }
+  .btn:hover { background: rgba(51,255,102,0.08); box-shadow: 0 0 16px rgba(51,255,102,0.15); }
+  .btn.ghost { border-color: var(--green-faint); color: var(--text-dim); }
+  .btn.ghost:hover { color: var(--green); border-color: var(--green-dim); }
 
-        .nav-container {
-            max-width: 1100px;
-            margin: 0 auto;
-            padding: 15px 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
+  section { padding: 60px 0; border-top: 1px solid var(--green-faint); }
+  h2 { color: var(--green); font-size: clamp(22px,4vw,32px); font-weight: 700; letter-spacing: 1px; margin-bottom: 24px; text-shadow: 0 0 6px rgba(51,255,102,0.3); }
+  p { margin-bottom: 16px; }
+  p .hl { color: var(--green); }
+  strong { color: var(--text); font-weight: 700; }
+  a.inline { color: var(--green); text-decoration: none; border-bottom: 1px solid var(--green-faint); }
+  a.inline:hover { border-bottom-color: var(--green); }
 
-        .logo {
-            font-size: 1.2rem;
-            font-weight: 700;
-            color: #00d4aa;
-            text-decoration: none;
-            transition: color 0.2s;
-        }
+  .grid { display: grid; grid-template-columns: repeat(2,1fr); gap: 2px; }
+  @media (max-width: 620px) { .grid { grid-template-columns: 1fr; } }
+  .card { background: var(--bg-raise); border: 1px solid var(--green-faint); padding: 22px 24px; }
+  .card:hover { border-color: var(--green-dim); box-shadow: inset 0 0 24px rgba(51,255,102,0.05); }
+  .card-name { color: var(--green); font-size: 17px; font-weight: 700; letter-spacing: 1px; margin-bottom: 8px; }
+  .card-name::before { content: "> "; color: var(--green-dim); }
+  .card-desc { color: var(--text-dim); font-size: 15px; }
 
-        .logo:hover {
-            color: #00b894;
-        }
+  .stats { display: grid; grid-template-columns: repeat(4,1fr); gap: 2px; }
+  @media (max-width: 620px) { .stats { grid-template-columns: repeat(2,1fr); } }
+  .stat { background: var(--bg-raise); border: 1px solid var(--green-faint); padding: 22px 16px; text-align: center; }
+  .stat-num { color: var(--green); font-size: 26px; font-weight: 700; text-shadow: 0 0 8px rgba(51,255,102,0.35); }
+  .stat-label { color: var(--text-dim); font-size: 13px; margin-top: 8px; letter-spacing: 1px; }
 
-        .nav-links {
-            display: flex;
-            gap: 30px;
-        }
+  pre { background: var(--bg-raise); border: 1px solid var(--green-faint); border-left: 3px solid var(--green-dim); padding: 20px 22px; overflow-x: auto; font-size: 14px; line-height: 1.7; color: var(--text); margin-top: 8px; }
+  pre .cmt { color: var(--text-dim); }
 
-        .nav-links a {
-            color: #e0e0e0;
-            text-decoration: none;
-            font-size: 0.95rem;
-            font-weight: 500;
-            transition: color 0.2s;
-        }
+  footer { border-top: 1px solid var(--green-faint); padding: 48px 0 40px; }
+  .foot-cols { display: flex; gap: 60px; flex-wrap: wrap; margin-bottom: 40px; }
+  .foot-col { display: flex; flex-direction: column; gap: 10px; }
+  .foot-title { color: var(--green); font-size: 13px; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 4px; }
+  .foot-col a { color: var(--text-dim); font-size: 14px; text-decoration: none; }
+  .foot-col a:hover { color: var(--green); }
+  .foot-bottom { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px; padding-top: 24px; border-top: 1px solid var(--green-faint); color: var(--text-dim); font-size: 13px; }
+  .foot-bottom .principle { color: var(--green-dim); }
 
-        .nav-links a:hover {
-            color: #00d4aa;
-        }
-
-        .hero {
-            background: #1a1a1a;
-            padding: 100px 20px;
-            text-align: center;
-            border-bottom: 2px solid #00d4aa;
-        }
-
-        .hero h1 {
-            font-size: 3.5rem;
-            margin-bottom: 20px;
-            font-weight: 700;
-            color: #00d4aa;
-        }
-
-        .hero .tagline {
-            font-size: 1.5rem;
-            color: #888;
-            margin-bottom: 30px;
-        }
-
-        .hero .description {
-            max-width: 700px;
-            margin: 0 auto 40px;
-            font-size: 1.1rem;
-            line-height: 1.8;
-        }
-
-        .cta-container {
-            display: flex;
-            gap: 15px;
-            justify-content: center;
-            flex-wrap: wrap;
-        }
-
-        .cta-btn {
-            display: inline-block;
-            background: #00d4aa;
-            color: #000;
-            padding: 15px 35px;
-            text-decoration: none;
-            border-radius: 6px;
-            font-weight: 600;
-            font-size: 1rem;
-            transition: all 0.2s;
-        }
-
-        .cta-btn:hover {
-            background: #00b894;
-            transform: translateY(-2px);
-        }
-
-        .cta-btn.secondary {
-            background: #333;
-            color: #e0e0e0;
-        }
-
-        .cta-btn.secondary:hover {
-            background: #444;
-        }
-
-        .container {
-            max-width: 1100px;
-            margin: 0 auto;
-            padding: 60px 20px;
-        }
-
-        h2 {
-            font-size: 2.5rem;
-            margin-bottom: 30px;
-            font-weight: 700;
-            color: #00d4aa;
-            text-align: center;
-        }
-
-        .feature-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 25px;
-            margin: 40px 0;
-        }
-
-        .feature-card {
-            background: #1a1a1a;
-            padding: 30px;
-            border-radius: 8px;
-            border: 1px solid #333;
-            transition: all 0.3s;
-        }
-
-        .feature-card:hover {
-            transform: translateY(-5px);
-            border-color: #00d4aa;
-        }
-
-        .feature-icon {
-            font-size: 3rem;
-            margin-bottom: 20px;
-        }
-
-        .feature-card h3 {
-            font-size: 1.5rem;
-            margin-bottom: 15px;
-            color: #e0e0e0;
-        }
-
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
-            margin: 40px 0 60px;
-        }
-
-        .stat-card {
-            background: #1a1a1a;
-            padding: 25px;
-            border-radius: 8px;
-            text-align: center;
-            border: 1px solid #333;
-        }
-
-        .stat-value {
-            font-size: 2.5rem;
-            font-weight: 700;
-            margin-bottom: 5px;
-            color: #00d4aa;
-        }
-
-        .stat-label {
-            font-size: 0.9rem;
-            color: #888;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        pre {
-            background: #1a1a1a;
-            padding: 25px;
-            border-radius: 8px;
-            overflow-x: auto;
-            border-left: 4px solid #00d4aa;
-            border: 1px solid #333;
-            margin: 40px 0;
-        }
-
-        code {
-            font-family: 'Courier New', monospace;
-            font-size: 0.95rem;
-            color: #e0e0e0;
-        }
-
-        footer {
-            background: #1a1a1a;
-            padding: 40px 20px;
-            text-align: center;
-            border-top: 2px solid #00d4aa;
-            margin-top: 80px;
-        }
-
-        .footer-links {
-            margin: 20px 0;
-        }
-
-        footer a {
-            color: #00d4aa;
-            text-decoration: none;
-            margin: 0 15px;
-            font-size: 0.95rem;
-            transition: color 0.2s;
-        }
-
-        footer a:hover {
-            color: #00b894;
-        }
-
-        .footer-copyright {
-            margin-top: 30px;
-            font-size: 0.85rem;
-            color: #666;
-        }
-
-        .footer-tagline {
-            margin-top: 15px;
-            font-size: 0.9rem;
-            color: #888;
-        }
-    </style>
+  @media (prefers-reduced-motion: reduce) { .logo .cursor { animation: none; } html { scroll-behavior: auto; } }
+  @media (max-width: 600px) { header { min-height: 66vh; } .logo { letter-spacing: 3px; } }
+  .hero-center { display: flex; flex-direction: column; align-items: center; text-align: center; }
+  .hero-center .logo { text-align: center; }
+  .hero-center .tagline { margin-left: auto; margin-right: auto; }
+  .hero-globe { display: flex; justify-content: center; margin: 8px 0 20px; }
+  .hero-globe canvas { filter: drop-shadow(0 0 5px rgba(51,255,102,0.4)); width: 340px; height: 340px; }
+  .cta-row { justify-content: center; }
+  @media (max-width: 600px) { .hero-globe canvas { width: 260px; height: 260px; } }
+  section p { color: var(--text); margin-bottom: 16px; }
+  section em { color: var(--text); font-style: normal; border-bottom: 1px solid var(--green-dim); padding-bottom: 1px; }
+  section ul { list-style: none; margin: 4px 0 20px; }
+  section ul li { padding-left: 24px; position: relative; color: var(--text-dim); margin-bottom: 12px; }
+  section ul li::before { content: ">"; position: absolute; left: 0; color: var(--green-dim); }
+  section ul li strong { color: var(--green); }
+  .closer { border-left: 3px solid var(--green-dim); background: var(--bg-raise); padding: 20px 24px; margin-top: 28px; }
+  .closer p { margin: 0; color: var(--text); }
+</style>
 </head>
 <body>
-    <nav class="navbar">
-        <div class="nav-container">
-            <a href="#top" class="logo">Valid</a>
-            <div class="nav-links">
-                <a href="#features">Features</a>
-                <a href="#status">Status</a>
-                <a href="#quickstart">Quick Start</a>
-                <a href="https://github.com/HiImRook/accessible-pos-chain" target="_blank">GitHub</a>
-            </div>
-        </div>
-    </nav>
 
-    <div class="hero" id="top">
-        <h1>Valid Blockchain</h1>
-        <p class="tagline">Accessible Proof-of-Stake for Everyone</p>
-        <p class="description">
-            A lightweight blockchain designed to run on modest hardware. 
-            No wealth requirement. Merit-based participation. Built for global accessibility.
-        </p>
-        <div class="cta-container">
-            <a href="https://github.com/HiImRook/accessible-pos-chain" class="cta-btn">View on GitHub</a>
-            <a href="https://github.com/HiImRook/accessible-pos-chain/releases" class="cta-btn secondary">Download v0.5.0-rc1</a>
-        </div>
+<nav class="topnav">
+  <div class="wrap nav-inner">
+    <a class="nav-brand" href="index.html">Valid Blockchain</a>
+    <div class="nav-links">
+      <a href="#features">Features</a>
+      <a href="#status">Status</a>
+      <a href="#quickstart">Quick Start</a>
+      <a href="https://github.com/HiImRook/accessible-tpi-chain">GitHub</a>
     </div>
+  </div>
+</nav>
 
-    <div class="container">
-        <h2 id="features">Core Features</h2>
-        <div class="feature-grid">
-            <div class="feature-card">
-                <div class="feature-icon">🏆</div>
-                <h3>TPI Consensus</h3>
-                <p>Three validators verify each block. Merit-based selection. No stake required.</p>
-            </div>
-            <div class="feature-card">
-                <div class="feature-icon">💰</div>
-                <h3>Fair Tokenomics</h3>
-                <p>33M VLid over 21 years. Block rewards mint as work is proven. No pre-mine.</p>
-            </div>
-            <div class="feature-card">
-                <div class="feature-icon">🌍</div>
-                <h3>Accessible</h3>
-                <p>Runs on Raspberry Pi. 2GB RAM minimum. Designed for developing regions.</p>
-            </div>
-            <div class="feature-card">
-                <div class="feature-icon">⚡</div>
-                <h3>Fast Finality</h3>
-                <p>10-second blocks. Sub-second finality. Instant confirmation.</p>
-            </div>
-        </div>
+<header>
+  <div class="wrap hero-center">
+    <div class="logo">Valid</div>
+    <div class="hero-globe">
+      <canvas id="globe" width="340" height="340"></canvas>
+    </div>
+    <p class="tagline"><span class="hl">Accessible TPI consensus for everyone.</span> A lightweight blockchain designed to run on modest hardware.</p>
+    <p class="sub">No wealth requirement. Merit-based participation. Built for global accessibility.</p>
+    <div class="cta-row">
+      <a class="btn" href="https://github.com/HiImRook/accessible-tpi-chain">View on GitHub</a>
+      <a class="btn ghost" href="https://github.com/HiImRook/accessible-tpi-chain/releases">Download v0.7.6</a>
+    </div>
+  </div>
+</header>
 
-        <h2 id="status">Current Status</h2>
-        <div class="stats-grid">
-            <div class="stat-card">
-                <div class="stat-value">v0.5.0-rc1</div>
-                <div class="stat-label">Version</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-value">33</div>
-                <div class="stat-label">Tests Passing</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-value">42%</div>
-                <div class="stat-label">Test Coverage</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-value">Testnet</div>
-                <div class="stat-label">Ready</div>
-            </div>
-        </div>
+<section>
+  <div class="wrap">
+    <h2>Overview</h2>
+    <p>Valid Blockchain is a lightweight blockchain designed to run on modest hardware in developing regions. Unlike traditional blockchains that require expensive infrastructure or large token holdings to participate, Valid runs on as little as <em>a few MB of RAM</em>.</p>
+    <p>The network uses merit-based validator selection rather than wealth-based staking. Validators earn rewards through reliable uptime and honest participation, not by holding large amounts of tokens. This creates a system where anyone with basic hardware and internet access can contribute to network security.</p>
+    <p>With 10-second blocks and sub-second finality through <strong>Three-Party Integrity (TPI)</strong> consensus, Valid delivers fast transaction confirmation without sacrificing decentralization or accessibility.</p>
+  </div>
+</section>
 
-        <h2 id="quickstart">Quick Start</h2>
-        <pre><code># Install Rust
+<section>
+  <div class="wrap">
+    <h2 id="features">Core Features</h2>
+    <div class="grid">
+      <div class="card">
+        <div class="card-name">TPI Consensus</div>
+        <div class="card-desc">Three validators verify each block. Merit-based selection. No stake required.</div>
+      </div>
+      <div class="card">
+        <div class="card-name">Fair Tokenomics</div>
+        <div class="card-desc">33M VLid over 21 years. Block rewards mint as work is proven. No pre-mine.</div>
+      </div>
+      <div class="card">
+        <div class="card-name">Accessible</div>
+        <div class="card-desc">Uses only a few MB of RAM, so it runs on modest hardware anywhere.</div>
+      </div>
+      <div class="card">
+        <div class="card-name">Fast Finality</div>
+        <div class="card-desc">10-second blocks. Sub-second finality. Instant confirmation.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2>How it Works</h2>
+    <p>Valid uses <strong>Three-Party Integrity (TPI)</strong> consensus. For each block, three validators are selected based on merit to verify transactions and broadcast the result. If all three agree, the block is finalized instantly. If two agree, the majority wins. If consensus fails, a backup validator (the "racer") steps in.</p>
+    <p>All blockchain state lives in memory using Rust's efficient Maps and HashMaps, so there are no external databases or bloated storage requirements. Every 6 hours, a snapshot is archived to ensure persistence without sacrificing performance.</p>
+    <p>Validators earn block rewards (0.0808 VLid per block in Epoch 0) plus transaction fees. Rewards decrease over three 7-year epochs (60%/30%/10% distribution), ensuring a predictable 21-year emission schedule with no sudden inflation.</p>
+    <p>The network prioritizes high-fee transactions while maintaining fairness. Anti-frontrunning protections use the parent block hash as a deterministic seed to prevent manipulation.</p>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2 id="status">Current Status</h2>
+    <div class="stats">
+      <div class="stat"><div class="stat-num">v0.7.6</div><div class="stat-label">VERSION</div></div>
+      <div class="stat"><div class="stat-num">119</div><div class="stat-label">TESTS PASSING</div></div>
+      <div class="stat"><div class="stat-num">A Few MB</div><div class="stat-label">RAM USED</div></div>
+      <div class="stat"><div class="stat-num">Testnet</div><div class="stat-label">DEVELOPMENT</div></div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2>The Mission</h2>
+    <p>Most blockchains optimize for Silicon Valley. <em>Valid optimizes for everywhere else.</em></p>
+    <p>The blockchain industry has created barriers that exclude billions of people: expensive validator hardware, large minimum stakes, high-bandwidth requirements, and complex technical knowledge. Valid removes these barriers.</p>
+    <ul>
+      <li><strong>Global Accessibility:</strong> a few MB of RAM means validators can run on hardware affordable in any economy</li>
+      <li><strong>Merit Over Wealth:</strong> Validator selection based on uptime and reliability, not token holdings</li>
+      <li><strong>Community Sovereignty:</strong> No venture capital, no foundation, no pre-mine, just open-source code</li>
+      <li><strong>Honest Economics:</strong> 33M VLid minted over 21 years through proven validation, 0.1% genesis allocation for testnet contributors</li>
+      <li><strong>Real Decentralization:</strong> Designed for thousands of validators, not a handful of whales</li>
+    </ul>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2>Into the Future</h2>
+    <p>Valid is a Layer 1 foundation designed to support specialized Layer 2 networks:</p>
+    <ul>
+      <li><strong>VNS (Valid Name Service):</strong> Decentralized domain registry running on 16GB validators</li>
+      <li><strong>VIPFS (Valid InterPlanetary File System):</strong> Content distribution with efficient routing</li>
+      <li><strong>KEVIN (Distributed AI Inference):</strong> GPU-powered compute network for AI workloads</li>
+    </ul>
+    <p>The testnet launches soon with 33,000 VLid allocated for early validators and community contributors. Mainnet follows once the network proves stable under real-world conditions.</p>
+    <div class="closer">
+      <p>This isn't about competing with Ethereum or Solana on enterprise features. This is about building infrastructure that works for <em>the 90% of the world they've ignored</em>.</p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2 id="quickstart">Quick Start</h2>
+    <pre><span class="cmt"># Install Rust</span>
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 
-# Clone and build
-git clone https://github.com/HiImRook/accessible-pos-chain.git
-cd accessible-pos-chain
+<span class="cmt"># Clone and build</span>
+git clone https://github.com/HiImRook/accessible-tpi-chain.git
+cd accessible-tpi-chain
 cargo build --release
 
-# Run validator
-./target/release/pos-chain</code></pre>
-    </div>
+<span class="cmt"># Run validator</span>
+./target/release/pos-chain</pre>
+    <p class="sub" style="margin-top:20px;">Full setup and networking guides are in the repository.</p>
+  </div>
+</section>
 
-    <footer>
-        <p>Valid Blockchain</p>
-        <div class="footer-links">
-            <a href="https://github.com/HiImRook/accessible-pos-chain">GitHub</a>
-            <a href="https://github.com/HiImRook/accessible-pos-chain/blob/main/CHANGELOG.md">Changelog</a>
-            <a href="https://github.com/HiImRook/accessible-pos-chain/blob/main/ROADMAP.md">Roadmap</a>
+<footer>
+  <div class="wrap">
+    <div class="foot-cols">
+      <div class="foot-col">
+        <div class="foot-title">Valid Blockchain</div>
+        <a href="#features">Features</a>
+        <a href="#status">Status</a>
+        <a href="#quickstart">Quick Start</a>
         </div>
-        <p class="footer-tagline">No venture capital. No pre-mine. No foundation.</p>
-        <p class="footer-copyright">© 2024-2026 Rook. All rights reserved.</p>
-    </footer>
+      <div class="foot-col">
+        <div class="foot-title">Project</div>
+        <a href="https://github.com/HiImRook/accessible-tpi-chain">GitHub</a>
+        <a href="https://github.com/HiImRook/accessible-tpi-chain/blob/main/CHANGELOG.md">Changelog</a>
+        <a href="https://github.com/HiImRook/accessible-tpi-chain/blob/main/ROADMAP.md">Roadmap</a>
+      </div>
+      <div class="foot-col">
+        <div class="foot-title">Connect</div>
+        <a href="https://discord.gg/2SP383cJs9">Discord</a>
+        <a href="https://github.com/HiImRook">GitHub Profile</a>
+        <a href="https://github.com/sponsors/HiImRook">Sponsor</a>
+      </div>
+    </div>
+    <div class="foot-bottom">
+      <span>&copy; 2024-2026 by Rook</span>
+      
+    </div>
+  </div>
+</footer>
+
+<script>
+(function(){
+  const cv = document.getElementById('globe');
+  if(!cv) return;
+  const ctx = cv.getContext('2d');
+  const CX = 170, CY = 170, R = 130;
+  const GREEN = '#33ff66';
+  function rotY(p,a){const c=Math.cos(a),s=Math.sin(a);return{x:p.x*c+p.z*s,y:p.y,z:-p.x*s+p.z*c};}
+  function rotX(p,a){const c=Math.cos(a),s=Math.sin(a);return{x:p.x,y:p.y*c-p.z*s,z:p.y*s+p.z*c};}
+  const lats=[],lons=[]; const LAT=7,LON=12,SEG=60;
+  for(let i=1;i<LAT+1;i++){const phi=-Math.PI/2+(Math.PI*i/(LAT+1));const ring=[];for(let j=0;j<=SEG;j++){const th=2*Math.PI*j/SEG;ring.push({x:Math.cos(phi)*Math.cos(th),y:Math.sin(phi),z:Math.cos(phi)*Math.sin(th)});}lats.push(ring);}
+  for(let i=0;i<LON;i++){const th=2*Math.PI*i/LON;const mer=[];for(let j=0;j<=SEG;j++){const phi=-Math.PI/2+Math.PI*j/SEG;mer.push({x:Math.cos(phi)*Math.cos(th),y:Math.sin(phi),z:Math.cos(phi)*Math.sin(th)});}lons.push(mer);}
+  const tilt=-0.35; let ang=0;
+  function drawWire(pts,a,side){for(let k=0;k<pts.length-1;k++){let A=rotX(rotY(pts[k],a),tilt);let B=rotX(rotY(pts[k+1],a),tilt);const z=(A.z+B.z)/2;if(side==='back'&&z>=0)continue;if(side==='front'&&z<0)continue;const al=0.14+0.7*((z+1)/2);ctx.strokeStyle='rgba(51,255,102,'+al.toFixed(3)+')';ctx.lineWidth=0.5+0.8*((z+1)/2);ctx.beginPath();ctx.moveTo(CX+A.x*R,CY-A.y*R);ctx.lineTo(CX+B.x*R,CY-B.y*R);ctx.stroke();}}
+  const VT=-74,VB=86;
+  function vPath(){const ht=68,thick=36;const p=new Path2D();p.moveTo(-ht,VT);p.lineTo(0,VB);p.lineTo(ht,VT);p.lineTo(ht-thick,VT);p.lineTo(0,VB-thick*1.15);p.lineTo(-ht+thick,VT);p.closePath();return p;}
+  function drawV(){ctx.save();ctx.translate(CX,CY);const path=vPath();
+    ctx.shadowColor='rgba(51,255,102,0.9)';ctx.shadowBlur=18;ctx.fillStyle=GREEN;ctx.fill(path);ctx.shadowBlur=0;
+    const g=ctx.createLinearGradient(0,VT,0,VB);g.addColorStop(0,'rgba(51,255,102,1)');g.addColorStop(1,'rgba(20,120,55,1)');ctx.fillStyle=g;ctx.fill(path);
+    ctx.save();ctx.clip(path);ctx.strokeStyle='rgba(10,14,10,0.85)';ctx.lineWidth=3;for(let y=VT;y<=VB;y+=10){ctx.beginPath();ctx.moveTo(-90,y);ctx.lineTo(90,y);ctx.stroke();}
+    ctx.strokeStyle='rgba(180,255,200,0.5)';ctx.lineWidth=1.2;for(let y=VT+4;y<=VB;y+=20){ctx.beginPath();ctx.moveTo(-90,y+2);ctx.lineTo(90,y+2);ctx.stroke();}ctx.restore();
+    ctx.lineWidth=2;ctx.strokeStyle='#7dffa6';ctx.shadowColor='rgba(51,255,102,0.8)';ctx.shadowBlur=7;ctx.stroke(path);ctx.restore();}
+  function frame(){ctx.clearRect(0,0,cv.width,cv.height);
+    for(const r of lats)drawWire(r,ang,'back');for(const m of lons)drawWire(m,ang,'back');
+    drawV();
+    for(const r of lats)drawWire(r,ang,'front');for(const m of lons)drawWire(m,ang,'front');
+    ctx.strokeStyle=GREEN;ctx.lineWidth=2;ctx.beginPath();ctx.arc(CX,CY,R,0,2*Math.PI);ctx.stroke();
+    ang+=0.005;requestAnimationFrame(frame);}
+  frame();
+})();
+</script>
 </body>
 </html>
