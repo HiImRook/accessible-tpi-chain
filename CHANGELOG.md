@@ -5,6 +5,29 @@ All notable changes to Valid Blockchain will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.8.0] - 2026-08-24
+
+### Added
+- correlation.rs — scaffold for broadcast anchor collection, peer response sampling, passive RTT fingerprinting, cluster detection, and correlation window analysis
+- behavioral_merit.rs — scaffold for operational identity, wallet continuity, signing cadence, and behavioral merit scoring
+- integrity.rs — scaffold for NodeIntegrityScore, FlagRecord, FlagPattern, promotion decisioning, group penalty logic, and historical flag lifecycle
+- docs/v0.8-correlation-spec.md — full v0.8.x design specification covering the 90-day observer period, correlation detection architecture, passive RTT/location confidence, behavioral merit pipeline, and promotion gating
+- lib.rs — registered correlation, behavioral_merit, and integrity modules
+
+### Architecture
+- Two-tier network model defined: observer pool and validator pool
+- 90-day observer period established as the promotion gate
+- Merit decay model defined: continuous erosion without active participation
+- Heartbeat correlation detection designed across three vectors: broadcast arrival correlation, heartbeat synchronization, and reaction correlation
+- Passive RTT fingerprinting defined for geographic confidence and infrastructure similarity detection
+- FlagPattern cross-node matching for attacker behavior profiling across identity rotations
+- NodeIntegrityScore separates current confidence (recoverable) from historical flag record (permanent)
+- BroadcastAnchor bounded ring buffer model defined to satisfy Zero Footprint retention constraints
+- All three new modules scoped exclusively to valid-blockchain branch
+
+### Security
+- reqwest bumped 0.11 to 0.12 resolving h2 CVE RUSTSEC-2026-0258
+
 ## [0.7.6] - 2026-07-21
 
 ### Fixed
