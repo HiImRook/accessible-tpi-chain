@@ -1,7 +1,7 @@
 # Valid Blockchain - Development Roadmap
 
-**Current Version:** v0.7.6
-**Status:** v0.7.6 released (Testnet development)
+**Current Version:** v0.8.0
+**Status:** v0.8.0 released (Testnet development)
 
 ---
 
@@ -18,52 +18,67 @@ Features are documented **after** implementation to prevent roadmap drift.
 
 ## Version History (Completed)
 
+### v0.8.0 - Observer Period, Correlation Detection, and Integrity Scaffold (Aug 2026)
+- ✅ correlation.rs - broadcast anchor collection, peer response sampling, passive RTT fingerprinting, cluster detection, and correlation window analysis scaffolded
+- ✅ behavioral_merit.rs - operational identity, wallet continuity, signing cadence, and behavioral merit scoring scaffolded
+- ✅ integrity.rs - NodeIntegrityScore, FlagRecord, FlagPattern, promotion decisioning, group penalty logic, and historical flag lifecycle scaffolded
+- ✅ docs/v0.8-correlation-spec.md - full v0.8.x observer period and correlation detection architecture documented
+- ✅ Two-tier network model defined - observer pool open to all; validator pool requires 90-day behavioral merit accumulation and correlation analysis clearance
+- ✅ Merit decay model defined - continuous erosion without active participation makes mass node farming humanly impossible to maintain
+- ✅ Heartbeat correlation detection designed across three vectors: broadcast arrival correlation, heartbeat synchronization, and reaction correlation
+- ✅ Passive RTT fingerprinting defined for geographic confidence and infrastructure similarity detection
+- ✅ FlagPattern cross-node matching for behavioral profiling across identity rotations
+- ✅ NodeIntegrityScore separates recoverable current confidence from permanent historical flag record
+- ✅ BroadcastAnchor bounded ring buffer model defined to satisfy Zero Footprint retention constraints
+- ✅ lib.rs - correlation, behavioral_merit, and integrity modules registered
+- ✅ reqwest bumped 0.11 to 0.12, h2 CVE RUSTSEC-2026-0258 resolved
+
 ### v0.7.6 - Arweave Publication Validation (Jul 2026)
-- ✅ Arweave signing field order corrected to format 2 spec — format, owner, target, quantity, reward, anchor, tags, data_size, data_root
-- ✅ data_root leaf hash corrected — chunk bytes pre-hashed before leaf_hash() — matches arweave-js merkle.ts
+- ✅ Arweave signing field order corrected to format 2 spec - format, owner, target, quantity, reward, anchor, tags, data_size, data_root
+- ✅ data_root leaf hash corrected - chunk bytes pre-hashed before leaf_hash() - matches arweave-js merkle.ts
 - ✅ Wallet loading supports ARWEAVE_WALLET_PATH (file path) alongside ARWEAVE_JWK_JSON
 - ✅ Wallet address added to ArweaveWallet struct and logged at startup
 - ✅ Full POST /tx response body logged for observability
 - ✅ data_root and tx_id logged before submission
-- ✅ src/bin/arweave_test.rs — standalone test binary for live mainnet validation
-- ✅ Real archive segment submitted to Arweave mainnet — tx_id: 71o-aNdFvGGPEcIvK6b4MCFKQjS-FJD_-KAIKDeiKCA
+- ✅ src/bin/arweave_test.rs - standalone test binary for live mainnet validation
+- ✅ Archive segment submitted to Arweave mainnet - tx_id: 71o-aNdFvGGPEcIvK6b4MCFKQjS-FJD_-KAIKDeiKCA
 - ✅ data_root correctness confirmed against live network
 - ✅ RSA-PSS signing path confirmed correct
-- ✅ Inline upload confirmed sufficient — chunked upload not required at current segment sizes
+- ✅ Inline upload confirmed sufficient - chunked upload not required at current segment sizes
 
 ### v0.7.5 - TLS Trust Hardening Scaffolding (Jul 2026)
-- ✅ trusted_peer_fingerprints config field — optional SHA-256 fingerprint allowlist
-- ✅ tls_trust_mode config field — validated at startup, unsupported modes exit immediately
-- ✅ validate_peer_certificate() — shared cert extraction and trust check helper
-- ✅ is_trusted_fingerprint() — case-insensitive, whitespace-tolerant matching
-- ✅ LoggingOnlyVerifier — naming reflects actual behavior (logging only, not enforcement at rustls layer)
+- ✅ trusted_peer_fingerprints config field - optional SHA-256 fingerprint allowlist
+- ✅ tls_trust_mode config field - validated at startup, unsupported modes exit immediately
+- ✅ validate_peer_certificate() - shared cert extraction and trust check helper
+- ✅ is_trusted_fingerprint() - case-insensitive, whitespace-tolerant matching
+- ✅ LoggingOnlyVerifier - naming reflects actual behavior (logging only, not enforcement at rustls layer)
 - ✅ Outbound connection and broadcast path both enforce fingerprint allowlist
 - ✅ Empty allowlist = trust all, backward compatible
 - ✅ 12 TLS trust tests
-- ⚠️ LoggingOnlyVerifier passes all certs at rustls layer — application-level check only
-- ⚠️ Ephemeral certs regenerate at startup — fingerprints must be exchanged out-of-band per session
+- ⚠️ LoggingOnlyVerifier passes all certs at rustls layer - application-level check only
+- ⚠️ Ephemeral certs regenerate at startup - fingerprints must be exchanged out-of-band per session
 - ⚠️ Persistent validator identity key and session-stable cert pinning deferred
 
 ### v0.7.4 - Network Abuse Hardening (Jul 2026)
-- ✅ Per-IP inbound connection rate limiting — 5 attempts per 60 seconds, keyed by source IP only
-- ✅ Per-peer inbound message rate limiting — 100 messages per 10 seconds per connected peer
-- ✅ Handshake counts against peer message budget — rate-limited peers disconnected immediately
-- ✅ Rate check runs before update_seen() — rate-limited messages do not mutate peer liveness
+- ✅ Per-IP inbound connection rate limiting - 5 attempts per 60 seconds, keyed by source IP only
+- ✅ Per-peer inbound message rate limiting - 100 messages per 10 seconds per connected peer
+- ✅ Handshake counts against peer message budget - rate-limited peers disconnected immediately
+- ✅ Rate check runs before update_seen() - rate-limited messages do not mutate peer liveness
 - ✅ message_timestamps migrated during normalize_peer_address() with stale entry pruning
 - ✅ cleanup_stale_peers() removes message_timestamps alongside peer and dial entries
-- ✅ PeerManager::apply_handshake_metadata() — handshake policy extracted into testable helper
+- ✅ PeerManager::apply_handshake_metadata() - handshake policy extracted into testable helper
 - ✅ Gossiped peer addresses validated before entering PeerManager
-- ✅ RPC addresses validated after canonicalization — invalid normalized RPC not bound
+- ✅ RPC addresses validated after canonicalization - invalid normalized RPC not bound
 - ✅ Invalid their_addr rejects all handshake data including gossip and RPC
-- ✅ split_host_port() rejects empty bracketed hosts — []:8000 correctly rejected
+- ✅ split_host_port() rejects empty bracketed hosts - []:8000 correctly rejected
 - ✅ 7 rate limiting tests
 - ✅ 23 handshake validation and address parser tests
 
 ### v0.7.3 - Peer and Address Canonicalization Hardening (Jul 2026)
-- ✅ address.rs canonicalization module — wildcard, localhost, IPv6, hostname normalization
-- ✅ is_valid_peer_addr() — malformed inbound handshake identities dropped before hashing
+- ✅ address.rs canonicalization module - wildcard, localhost, IPv6, hostname normalization
+- ✅ is_valid_peer_addr() - malformed inbound handshake identities dropped before hashing
 - ✅ Inbound identity derived from canonicalized advertised peer_addr
-- ✅ bind_canonical_dial_target() — explicit dial target upgrade on handshake
+- ✅ bind_canonical_dial_target() - explicit dial target upgrade on handshake
 - ✅ normalize_peer_address() correctly migrates dial target to canonical hash
 - ✅ 18 address canonicalization tests
 - ✅ 8 peer manager reconciliation tests
@@ -71,10 +86,10 @@ Features are documented **after** implementation to prevent roadmap drift.
 - ⚠️ RPC address validation completed in v0.7.4
 
 ### v0.7.2 - TLS 1.3 P2P Transport Encryption (Jul 2026)
-- ✅ TLS 1.3 on all P2P connections — inbound and outbound
-- ✅ Ephemeral self-signed certificates generated in memory at startup — never persisted
-- ✅ FingerprintVerifier — peer certificate fingerprints logged for observability
-- ✅ Shared TLS configs via Arc — generated once at startup, not per connection
+- ✅ TLS 1.3 on all P2P connections - inbound and outbound
+- ✅ Ephemeral self-signed certificates generated in memory at startup - never persisted
+- ✅ FingerprintVerifier - peer certificate fingerprints logged for observability
+- ✅ Shared TLS configs via Arc - generated once at startup, not per connection
 - ✅ Framed message protocol generalized over AsyncRead + AsyncWrite + Unpin
 - ✅ Peer identity model preserved above transport layer
 - ✅ rust-toolchain.toml bumped to 1.88.0
@@ -82,21 +97,21 @@ Features are documented **after** implementation to prevent roadmap drift.
 - ⚠️ RPC sync transport hardening deferred
 
 ### v0.7.1 - Validator IP Hashing and Peer Identity/Transport Separation (Jul 2026)
-- ✅ Epoch-salted peer address hashing — raw IPs never stored as peer identity
-- ✅ PeerManager identity/transport split — peers HashMap keyed by hash, dial_targets HashMap for raw addresses
-- ✅ Inbound peer registration deferred until handshake — no ephemeral source port hashing
-- ✅ Inbound identity from advertised peer_addr — stable across reconnects
-- ✅ Outbound provisional identity from dial target — reconciled via handshake normalization
-- ✅ Broadcast dials raw transport targets — logs hashes only
-- ✅ Gossip stays dialable — known_peers returns raw addresses
-- ✅ PeerInfo.address renamed to PeerInfo.peer_hash — semantic alignment
-- ⚠️ resolve_dial_addr() handles 0.0.0.0:port only — hostname/IPv6 deferred
-- ⚠️ Wildcard RPC normalization uses advertised address — resolved dial target deferred
+- ✅ Epoch-salted peer address hashing - raw IPs never stored as peer identity
+- ✅ PeerManager identity/transport split - peers HashMap keyed by hash, dial_targets HashMap for raw addresses
+- ✅ Inbound peer registration deferred until handshake - no ephemeral source port hashing
+- ✅ Inbound identity from advertised peer_addr - stable across reconnects
+- ✅ Outbound provisional identity from dial target - reconciled via handshake normalization
+- ✅ Broadcast dials raw transport targets - logs hashes only
+- ✅ Gossip stays dialable - known_peers returns raw addresses
+- ✅ PeerInfo.address renamed to PeerInfo.peer_hash - semantic alignment
+- ⚠️ resolve_dial_addr() handles 0.0.0.0:port only - hostname/IPv6 deferred
+- ⚠️ Wildcard RPC normalization uses advertised address - resolved dial target deferred
 
 ### v0.7.0 - Handshake Cleanup and TPI Identity Release (Jun 2026)
 - ✅ validator_id removed from peer handshake entirely
 - ✅ Peer connections are identity-free at the transport layer
-- ✅ SPO delegation dropped — Valid Blockchain is a TPI chain, not PoS
+- ✅ SPO delegation dropped - Valid Blockchain is a TPI chain, not PoS
 - ✅ Quorum gating replaced by sync-complete readiness
 - ✅ delegations removed from ChainState and snapshot
 - ✅ TPI proves validator legitimacy through block production, not handshake declarations
@@ -104,21 +119,21 @@ Features are documented **after** implementation to prevent roadmap drift.
 
 ### v0.6.7 - Arweave Archive Publication Sidecar (Jun 2026)
 - ✅ Backend-neutral publication contract (manifest/receipt/status)
-- ✅ Arweave uploader — JWK wallet loading, deep hash, RSA-PSS signing, inline upload
-- ✅ Background publisher loop — 5-minute scan, retry on failure, skip terminal statuses
-- ✅ Oversize guard — segments > 8MB deferred, configurable via ARWEAVE_INLINE_MAX_BYTES
-- ✅ Tag schema — chain-native metadata embedded in every archive upload
+- ✅ Arweave uploader - JWK wallet loading, deep hash, RSA-PSS signing, inline upload
+- ✅ Background publisher loop - 5-minute scan, retry on failure, skip terminal statuses
+- ✅ Oversize guard - segments > 8MB deferred, configurable via ARWEAVE_INLINE_MAX_BYTES
+- ✅ Tag schema - chain-native metadata embedded in every archive upload
 - ✅ Prune correctness never gated on remote upload success
-- ✅ Audit config — inapplicable advisories documented and ignored
+- ✅ Audit config - inapplicable advisories documented and ignored
 - ⚠️ Arweave Merkle data_root correctness confirmed in v0.7.6
-- ⚠️ Chunked upload deferred — inline upload sufficient at current segment sizes
+- ⚠️ Chunked upload deferred - inline upload sufficient at current segment sizes
 
 ### v0.6.6 - Archive Lock-Scope and Concurrency Hardening (Jun 2026)
 - ✅ ChainState write lock no longer held during archive disk I/O
 - ✅ Archive file I/O moved off Tokio worker threads via spawn_blocking
 - ✅ Duplicate concurrent archive task guard (in-memory HashSet)
 - ✅ Archive work fully decoupled from block production/receipt critical path
-- ✅ 11 new archive unit tests — checksum, version, block-count, round-trip coverage
+- ✅ 11 new archive unit tests - checksum, version, block-count, round-trip coverage
 - ✅ Prune range fixed deterministically at trigger time
 
 ### v0.6.5 - RPC Error Handling Hardening (Jun 2026)
@@ -126,18 +141,18 @@ Features are documented **after** implementation to prevent roadmap drift.
 - ✅ MempoolRejection enum distinguishes Duplicate vs Full
 - ✅ /balance and /block reject malformed requests with 400 instead of silent defaults
 - ✅ Consistent ErrorResponse body across RPC error paths
-- ✅ Backward-compatible — all existing tests pass unchanged
+- ✅ Backward-compatible - all existing tests pass unchanged
 
 ### v0.6.4 - Auth Binding and Nonce Fixes (Jun 2026)
-- ✅ Auth binding gap fixed — from address verified against from_pubkey
-- ✅ Wallet nonce hardcoded 0 fixed — live nonce fetched from RPC before signing
+- ✅ Auth binding gap fixed - from address verified against from_pubkey
+- ✅ Wallet nonce hardcoded 0 fixed - live nonce fetched from RPC before signing
 - ✅ GET /nonce/:address RPC endpoint added
 - ✅ pubkey_hex_to_address() helper in crypto.rs
 - ✅ fetch_nonce() fails loudly on RPC error
 
 ### v0.6.3 - Peer-Based Live Sync (Jun 2026)
 - ✅ RPC address carried in peer handshake
-- ✅ RPC address normalization (0.0.0.0 → peer IP)
+- ✅ RPC address normalization (0.0.0.0 to peer IP)
 - ✅ One-time startup catch-up sync via /head and /block/:slot
 - ✅ production_ready flips only after successful sync
 - ✅ Partial sync failure exits cleanly
@@ -147,8 +162,8 @@ Features are documented **after** implementation to prevent roadmap drift.
 - ✅ Validator ID carried in direct peer handshake
 - ✅ Canonical peer address normalization
 - ✅ Distinct validator ID counting for quorum
-- ✅ production_ready gate — blocks production until quorum confirmed
-- ✅ Solo node exception — immediate production when no bootstrap nodes
+- ✅ production_ready gate - blocks production until quorum confirmed
+- ✅ Solo node exception - immediate production when no bootstrap nodes
 - ✅ 120 second startup timeout with clean exit
 
 ### v0.6.1 - Archive Segment Integration (Jun 2026)
@@ -156,11 +171,11 @@ Features are documented **after** implementation to prevent roadmap drift.
 - ✅ Triggers every 2,160 blocks on both received and produced blocks
 - ✅ Full segment count required before archive/prune
 - ✅ Read-back verification after write
-- ✅ Genesis identity fixed at startup — no peer adoption
+- ✅ Genesis identity fixed at startup - no peer adoption
 - ✅ Genesis mismatch logging on handshake
 
 ### v0.6.0-alpha.3 - Archive Segment Module (May 2026)
-- ✅ archive.rs — 6-hour archive segment module
+- ✅ archive.rs - 6-hour archive segment module
 - ✅ ArchiveSegment and ArchiveMetadata structs
 - ✅ Deterministic segment checksum over full block and transaction content
 - ✅ build_archive_segment() from block range
@@ -230,9 +245,9 @@ Features are documented **after** implementation to prevent roadmap drift.
 
 ## Upcoming Releases
 
-### v0.8.0 - Live Testnet Deployment (Target: Q3 2026)
+### v0.8.1 - Live Testnet Deployment (Target: Q3 2026)
 
-**Primary goal:** Move from local hardening work and private testnet to a live multi-node testnet and prove the network can sustain itself under real conditions.
+**Primary goal:** Deploy the network across real locations and prove it sustains itself without bootstrap reliance.
 
 **In scope:**
 - Deploy bootstrap/local nodes in real physical locations
@@ -264,6 +279,11 @@ Features are documented **after** implementation to prevent roadmap drift.
 
 ## Future Considerations (v0.9.0+)
 
+### Correlation and Integrity Implementation
+- correlation.rs - wire broadcast anchor recording into network.rs, passive RTT collection from protocol traffic, cluster detection and scoring
+- behavioral_merit.rs - wallet continuity tracking, uptime scoring, on-chain activity cadence
+- integrity.rs - promotion gating at 90-day observer period completion, group penalty enforcement, historical flag lifecycle management
+
 ### Anti-Frontrunning
 - Parent block hash as deterministic transaction ordering seed
 - Eliminate MEV extraction without requiring a private mempool
@@ -282,11 +302,11 @@ Features are documented **after** implementation to prevent roadmap drift.
 
 ### Layer 2: VNS (Valid Name Service)
 - Domain registry built in the same minimal architectural style as L1
-- L2 witnesses L1 payments via light-client style verification — no bridge
+- L2 witnesses L1 payments via light-client style verification, no bridge
 - Own-forever naming model rather than recurring renewal
 - Premium-name policy and anti-spam economics to be defined during implementation
 - Blacklist/governance enforcement, if any, to be narrowly scoped and explicitly documented
-- VLid-native economic model — no separate token
+- VLid-native economic model, no separate token
 
 ### Layer 2: VIPFS (Valid IPFS)
 - Distributed content seeding and retrieval layer
@@ -320,12 +340,13 @@ Features are documented **after** implementation to prevent roadmap drift.
 
 ## Known Limitations
 
-⚠️ **Chunked upload not implemented** — segments over 8MB deferred; inline upload sufficient at current segment sizes
-⚠️ **LoggingOnlyVerifier passes all certs at rustls layer** — application-level trust check only
-⚠️ **Ephemeral certs regenerate at startup** — fingerprints must be exchanged out-of-band per session
-⚠️ **Persistent validator identity key deferred** — session-stable cert pinning not yet implemented
+⚠️ **Chunked upload not implemented** - segments over 8MB deferred; inline upload sufficient at current segment sizes
+⚠️ **LoggingOnlyVerifier passes all certs at rustls layer** - application-level trust check only
+⚠️ **Ephemeral certs regenerate at startup** - fingerprints must be exchanged out-of-band per session
+⚠️ **Persistent validator identity key deferred** - session-stable cert pinning not yet implemented
 ⚠️ **RPC sync transport hardening deferred**
-⚠️ **Genesis mismatch policy** — currently logged but handshake metadata still applied; future hardening decision
+⚠️ **Genesis mismatch policy** - currently logged but handshake metadata still applied; future hardening decision
+⚠️ **correlation.rs, behavioral_merit.rs, integrity.rs scaffolded only** - implementation begins after live testnet deployment is stable
 
 **These are intentional staging decisions, not bugs, oversights, or knowledge gaps.**
 
@@ -346,4 +367,4 @@ MIT License - See LICENSE file for details
 
 ---
 
-**Last Updated:** Jul 22, 2026
+**Last Updated:** Aug 24, 2026
