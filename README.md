@@ -1,12 +1,18 @@
-# Accessible TPI Chain — Main Branch
+# Accessible TPI Chain — Protocol Branch
 
-A lightweight **TPI (Three-Party Integrity)** blockchain focused on accessibility, decentralization, and merit-based participation. Designed to run efficiently on modest hardware in developing regions while supporting advanced Layer 2 networks.
+> 📋 **Branch Notice**
+>
+> This branch was previously named `main` and has been renamed to `protocol` to better reflect its purpose. It is the clean, forkable base of the Accessible TPI Chain, not the active development branch. It exists for teams and developers who want to fork the protocol and build their own network without inheriting Valid Blockchain-specific implementation decisions.
+>
+> For the live Valid Blockchain implementation, see the `valid-blockchain` branch. For closed/permissioned network deployments, see the `private-network` branch.
+
+Accessible TPI Chain is a lightweight **TPI (Three-Party Integrity)** blockchain focused on accessibility, decentralization, and merit-based participation. Designed to run efficiently on modest hardware in developing regions while supporting advanced Layer 2 networks.
 
 ---
 
-> ✅ **Network Identity Notice — v0.7.6**
->
-> Raw IP addresses are no longer stored as peer identity. Peer identity is epoch-salted and hashed from canonicalized addresses. Malformed handshake identities are dropped before hashing. Inbound connections and peer messages are rate limited. All P2P connections are encrypted with TLS 1.3. Certificate fingerprint pinning is now configurable. Certificates are ephemeral, generated in memory at startup and never persisted as identity artifacts. Archive segments are published to Arweave mainnet, transaction correctness validated live. Bootstrap remains a private ceremony between trusted partners. See [NETWORKING.md](NETWORKING.md) for full details.
+**Network Identity Notice - v0.8.0**
+
+Raw IP addresses are no longer stored as peer identity. Peer identity is epoch-salted and hashed from canonicalized addresses. Malformed handshake identities are dropped before hashing. Inbound connections and peer messages are rate limited. All P2P connections are encrypted with TLS 1.3. Certificate fingerprint pinning is configurable. Certificates are ephemeral, generated in memory at startup and never persisted as identity artifacts. Archive segments are published to Arweave mainnet, transaction correctness validated live. Bootstrap remains a private ceremony between trusted partners. See [NETWORKING.md](NETWORKING.md) for full details.
 
 ---
 
@@ -18,7 +24,7 @@ Valid Blockchain uses **Three-Party Integrity (TPI)** — an original consensus 
 - Exactly 3 validators are randomly selected from a pool of participants per block slot
 - Each computes a candidate block hash independently
 - The highest-merit validator among those in agreement produces the block
-- The other two verify — finality requires 2/3 agreement(66.66%)
+- The other two verify — finality requires 2/3 agreement (66.66%)
 - Bad behavior loses standing in merit, not tokens as no staking is required
 - No capital at stake and no computational race. Merit is gained through participation, wallet age, and must be maintained to avoid decay.
 
@@ -56,7 +62,7 @@ TPI is not borrowed from anywhere. I happily spent the past several years develo
 - Built-in metrics dashboard
 - Vendored dependencies for supply-chain security
 
-## Current Status: v0.7.6
+## Current Status: v0.8.0
 
 **Completed:**
 * ✅ TPI consensus — original mechanism, merit-based, no capital stake
@@ -211,13 +217,15 @@ TPI is not borrowed from anywhere. I happily spent the past several years develo
 - ✅ Arweave publication pipeline validated live on mainnet
 - ✅ 68 new network hardening tests
 
-### Phase 7: Network Maturity and Testnet Hardening 📋 (Future - v0.8.0+)
-- Further peer identity and canonicalization hardening
-- Hostname and IPv6 normalization in peer address resolution
-- RPC normalization against resolved dial targets
-- Additional network abuse resistance and malformed-message handling
-- Expanded integration and adversarial testing for networking, sync, and archival flows
-- Testnet stability, observability, and operational hardening
+### Phase 7: Observer Period and Correlation Detection 📋 (In Progress - v0.8.x)
+- ✅ Two-tier network model defined — observer pool and validator pool
+- ✅ 90-day observer period defined as promotion gate
+- ✅ correlation.rs, behavioral_merit.rs, integrity.rs scaffolded
+- ✅ Full v0.8.x architectural specification documented
+- 📋 Live testnet deployment
+- 📋 correlation.rs implementation
+- 📋 behavioral_merit.rs implementation
+- 📋 integrity.rs implementation
 
 ### Phase 8: Community Governance and Programmable Token Layer 📋 (Future)
 - Merit-based voting (XP + wallet age, not token balance)
@@ -267,8 +275,8 @@ TPI is not borrowed from anywhere. I happily spent the past several years develo
 
 ### Build from Source
 ```bash
-git clone https://github.com/HiImRook/accessible-pos-chain.git
-cd accessible-pos-chain
+git clone -b protocol https://github.com/HiImRook/accessible-tpi-chain.git
+cd accessible-tpi-chain
 cargo build --release
 ```
 
@@ -276,7 +284,7 @@ cargo build --release
 
 **Supply Model:**
 - **Total Cap:** 33 million VLid
-- **Timeline:** 21 years (3 epochs × 7 years)
+- **Timeline:** 21 years (3 epochs x 7 years)
 - **Decimals:** 9 (nanoVLid = 0.000000001 VLid)
 - **Genesis:** 33,000 VLid (0.1% bootstrap allocation)
 
@@ -312,7 +320,7 @@ All inbound peer addresses are canonicalized before hashing — wildcard bind ad
 Inbound connections are rate limited per source IP before the TLS handshake — ephemeral port rotation does not bypass the limit. Post-handshake message floods are disconnected immediately. Gossiped peer addresses and advertised RPC endpoints are validated before ingestion. Invalid peer identity in a handshake causes all associated handshake data to be ignored.
 
 **TLS 1.3 P2P Transport:**
-All peer connections are encrypted with TLS 1.3. Certificates are ephemeral — generated in memory at startup and discarded on shutdown. Certificate fingerprint pinning is now configurable via trusted_peer_fingerprints in config.toml. All outbound connections and broadcasts enforce the allowlist. Empty allowlist means trust all — existing deployments require no changes.
+All peer connections are encrypted with TLS 1.3. Certificates are ephemeral — generated in memory at startup and discarded on shutdown. Certificate fingerprint pinning is configurable via trusted_peer_fingerprints in config.toml. All outbound connections and broadcasts enforce the allowlist. Empty allowlist means trust all — existing deployments require no changes.
 
 **Arweave Publication Sidecar:**
 After each verified local archive segment, a publication manifest is queued. A background task processes the queue every 5 minutes, uploading segments to Arweave as permanent off-chain storage. Transaction construction, deep hash, RSA-PSS signing, and data_root correctness are validated against Arweave mainnet. Prune correctness never depends on upload success as local durability always gates prune. When VIPFS is ready, it replaces Arweave as the publication backend without touching validator logic.
@@ -374,9 +382,9 @@ Pre-mainnet. Community audits welcome. Professional audit planned before mainnet
 
 ## License
 
-MIT License — See LICENSE file
+MIT License - See LICENSE file
 
-Copyright (c) 2024-2026 Rook
+Copyright (c) 2024-2026 by Rook
 
 ## Acknowledgements
 
