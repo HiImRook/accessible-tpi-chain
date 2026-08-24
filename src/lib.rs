@@ -17,3 +17,6 @@ pub mod publication;
 pub mod arweave;
 pub mod tls;
 pub mod address;
+pub mod correlation;
+pub mod behavioral_merit;
+pub mod integrity;
