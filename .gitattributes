@@ -1,0 +1,3 @@
+vendor/* linguist-vendored=true
+src/*.rs linguist-language=Rust
+tests/*.rs linguist-language=Rust
