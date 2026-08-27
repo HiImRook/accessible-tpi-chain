@@ -2,11 +2,13 @@
 
 Live `valid-blockchain` branch of the Accessible TPI Chain.
 
+📄 [Whitepaper](docs/whitepaper.md) | 📋 [Litepaper](docs/litepaper.md)
+
 A sovereign **TPI (Three-Party Integrity)** blockchain written from scratch in Rust. No frameworks, pallets, or inherited consensus primitives.
 
 Designed as a reaction to unnecessarily heavy blockchain consensus and PC requirements.
 
-The `main` branch holds the forkable protocol base.
+The `protocol` branch holds the forkable protocol base.
 
 ---
 
@@ -21,7 +23,7 @@ The `main` branch holds the forkable protocol base.
 - Single Rust binary: one `cargo build --release` executable
 - Entire chain state lives in in-memory HashMaps
 - All dependencies vendored
-- Merit valued over capital: no token-weighted mechanics, no SPOs, period
+- Merit valued over capital, no token-weighted mechanics, no SPOs, period
 - You cannot leak what you never kept
 
 ## Consensus: TPI (Three-Party Integrity)
@@ -54,7 +56,7 @@ Future governance will be merit-based (participation + wallet age).
 - Full TPI consensus (random trio + merit producer + 2/3 finality) - original mechanism
 - validator_id removed from peer handshake entirely
 - Peer connections are identity-free at the transport layer
-- SPO delegation dropped - TPI chain, no longer PoS
+- SPO delegation dropped - TPI chain, not PoS
 - Startup quorum gating replaced by sync-complete readiness
 - Raw IP addresses never stored as peer identity
 - Epoch-salted peer address hashing - 24-hour rotation window derived from genesis hash
